@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>MTQE Poor Data Enrichment - Score Distribution Figures</title>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body { font-family: -apple-system, BlinkMacSystemFont, sans-serif; background: #0d0f18; color: #ddd; padding: 28px 20px; }
+h1 { text-align: center; font-weight: 200; font-size: 17px; letter-spacing: 2px; color: #999; margin-bottom: 6px; text-transform: uppercase; }
+.subtitle { text-align: center; font-size: 12px; color: #444; margin-bottom: 36px; }
+.panel { background: #131520; border: 1px solid #1e2235; border-radius: 8px; padding: 20px 20px 10px; max-width: 860px; margin: 0 auto 36px; }
+.panel h3 { font-size: 13px; font-weight: 500; color: #bbb; text-align: center; letter-spacing: 0.5px; margin-bottom: 3px; }
+.fig-num { font-size: 10px; color: #444; text-align: center; margin-bottom: 4px; letter-spacing: 1px; text-transform: uppercase; }
+.panel p { font-size: 11px; color: #555; text-align: center; margin-bottom: 12px; }
+canvas { display: block; width: 100%; }
+</style>
+</head>
+<body>
+<h1>MTQE Poor Data Enrichment &#8212; Score Distribution Figures</h1>
+<p class="subtitle">Count-scaled KDE &nbsp;&middot;&nbsp; See STUDY.md for full methodology &nbsp;&middot;&nbsp; SBCUSD domain, March 2026</p>
+<div class="panel">
+  <div class="fig-num">Figure 1</div>
+  <h3>en &#x2192; es &nbsp;|&nbsp; 74k Production Translations</h3>
+  <p>n = 74,250 &nbsp;&middot;&nbsp; mean = 1.44 &nbsp;&middot;&nbsp; Cohere model via Docker on gpu-a6002</p>
+  <canvas id="c1"></canvas>
+</div>
+<div class="panel">
+  <div class="fig-num">Figure 2</div>
+  <h3>es &#x2192; en &nbsp;|&nbsp; 74k Production Translations</h3>
+  <p>n = 74,250 &nbsp;&middot;&nbsp; mean = 1.86 &nbsp;&middot;&nbsp; Cohere model via Docker on gpu-a6002</p>
+  <canvas id="c2"></canvas>
+</div>
+<div class="panel">
+  <div class="fig-num">Figure 3</div>
+  <h3>en &#x2192; es &nbsp;|&nbsp; Eval Set by Human Label</h3>
+  <p>Calibration set from labels-vs-metricx/ &nbsp;&middot;&nbsp; Good (9,518) &nbsp;&middot;&nbsp; Adequate (9,759) &nbsp;&middot;&nbsp; Poor (6,219)</p>
+  <canvas id="c3"></canvas>
+</div>
+<div class="panel">
+  <div class="fig-num">Figure 4</div>
+  <h3>es &#x2192; en &nbsp;|&nbsp; Eval Set by Human Label</h3>
+  <p>Dev (338) + Test (1,000) &nbsp;&middot;&nbsp; Good (934) &nbsp;&middot;&nbsp; Adequate (404) &nbsp;&middot;&nbsp; No Poor labels collected for this direction</p>
+  <canvas id="c4"></canvas>
+</div>
+<script>
+const D = {"xs": [0.0, 0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0, 1.1, 1.2, 1.3, 1.4, 1.5, 1.6, 1.7, 1.8, 1.9, 2.0, 2.1, 2.2, 2.3, 2.4, 2.5, 2.6, 2.7, 2.8, 2.9, 3.0, 3.1, 3.2, 3.3, 3.4, 3.5, 3.6, 3.7, 3.8, 3.9, 4.0, 4.1, 4.2, 4.3, 4.4, 4.5, 4.6, 4.7, 4.8, 4.9, 5.0, 5.1, 5.2, 5.3, 5.4, 5.5, 5.6, 5.7, 5.8, 5.9, 6.0, 6.1, 6.2, 6.3, 6.4, 6.5, 6.6, 6.7, 6.8, 6.9, 7.0, 7.1, 7.2, 7.3, 7.4, 7.5, 7.6, 7.7, 7.8, 7.9, 8.0, 8.1, 8.2, 8.3, 8.4, 8.5, 8.6, 8.7, 8.8, 8.9, 9.0, 9.1, 9.2, 9.3, 9.4, 9.5, 9.6, 9.7, 9.8, 9.9, 10.0], "engesl_74k": [17318.88, 21768.14, 25898.09, 29392.83, 32075.22, 33889.2, 34845.38, 34981.81, 34364.35, 33107.26, 31376.53, 29360.94, 27229.71, 25105.89, 23065.45, 21149.99, 19377.54, 17748.61, 16253.17, 14880.2, 13624.31, 12484.79, 11460.02, 10543.77, 9726.18, 8996.15, 8342.11, 7751.55, 7212.11, 6714.09, 6251.77, 5821.97, 5421.64, 5047.04, 4694.82, 4363.07, 4050.73, 3756.38, 3478.27, 3215.47, 2968.82, 2740.21, 2531.06, 2341.4, 2170.06, 2015.24, 1874.76, 1746.11, 1626.79, 1515.08, 1410.32, 1312.55, 1221.77, 1137.66, 1059.69, 987.34, 920.1, 857.18, 797.61, 740.44, 684.97, 630.64, 576.99, 523.84, 471.61, 421.54, 375.39, 334.8, 300.67, 272.91, 250.58, 232.17, 216.09, 201.03, 186.23, 171.54, 157.18, 143.49, 130.76, 119.13, 108.64, 99.27, 90.95, 83.56, 77.02, 71.24, 66.18, 61.79, 58.0, 54.71, 51.81, 49.2, 46.79, 44.53, 42.49, 40.79, 39.63, 39.15, 39.39, 40.2, 41.25], "spaeng_74k": [10196.06, 13300.33, 16578.71, 19880.74, 23051.8, 25916.55, 28277.42, 29949.74, 30822.04, 30901.07, 30307.65, 29225.57, 27839.16, 26295.05, 24695.65, 23108.27, 21572.95, 20107.35, 18714.98, 17396.71, 16158.22, 15008.36, 13952.66, 12990.07, 12114.9, 11319.89, 10596.6, 9934.57, 9322.69, 8752.54, 8220.13, 7724.04, 7262.28, 6831.44, 6428.08, 6049.97, 5695.37, 5361.74, 5046.09, 4746.72, 4464.21, 4200.3, 3955.88, 3730.15, 3521.14, 3326.41, 3143.01, 2967.49, 2796.72, 2629.3, 2466.09, 2309.23, 2160.6, 2020.99, 1890.34, 1768.16, 1653.59, 1545.25, 1441.59, 1341.45, 1244.49, 1150.82, 1060.57, 973.76, 890.67, 812.07, 739.1, 672.69, 613.17, 560.23, 513.17, 471.02, 432.75, 397.41, 364.42, 333.63, 305.22, 279.37, 256.09, 235.2, 216.36, 199.17, 183.21, 168.21, 154.1, 141.15, 129.79, 120.46, 113.4, 108.56, 105.6, 104.01, 103.21, 102.67, 101.98, 100.87, 99.11, 96.55, 93.16, 89.11, 84.77], "enes_good": [2791.6, 3494.92, 4171.16, 4750.45, 5170.75, 5392.48, 5408.79, 5247.59, 4964.02, 4625.47, 4293.74, 4009.95, 3786.87, 3610.52, 3449.56, 3268.8, 3041.86, 2759.11, 2429.2, 2074.48, 1723.12, 1400.86, 1125.03, 902.32, 729.89, 598.8, 498.0, 417.61, 350.7, 293.55, 244.8, 204.24, 171.67, 146.38, 127.0, 111.84, 99.34, 88.39, 78.44, 69.46, 61.66, 55.24, 50.22, 46.34, 43.17, 40.25, 37.19, 33.8, 30.13, 26.37, 22.8, 19.63, 17.01, 14.94, 13.32, 12.02, 10.9, 9.88, 8.93, 8.05, 7.3, 6.69, 6.22, 5.85, 5.53, 5.18, 4.77, 4.27, 3.69, 3.06, 2.43, 1.85, 1.34, 0.94, 0.65, 0.45, 0.34, 0.31, 0.33, 0.4, 0.5, 0.61, 0.71, 0.8, 0.87, 0.89, 0.86, 0.8, 0.71, 0.6, 0.48, 0.36, 0.26, 0.18, 0.12, 0.08, 0.04, 0.03, 0.01, 0.01, 0.0], "enes_adeq": [1688.0, 2119.83, 2542.72, 2919.35, 3218.83, 3425.3, 3543.23, 3596.89, 3623.44, 3661.19, 3736.75, 3855.38, 3998.06, 4126.67, 4195.6, 4165.91, 4017.42, 3754.62, 3404.87, 3009.96, 2614.41, 2254.35, 1950.62, 1707.27, 1515.25, 1358.88, 1222.62, 1095.92, 974.94, 861.47, 760.04, 674.71, 606.86, 554.53, 513.17, 477.48, 443.1, 407.86, 371.99, 337.39, 306.51, 281.16, 261.74, 247.19, 235.48, 224.4, 212.33, 198.76, 184.25, 170.06, 157.53, 147.56, 140.23, 134.84, 130.18, 125.03, 118.54, 110.5, 101.33, 91.86, 83.01, 75.46, 69.44, 64.73, 60.81, 57.05, 52.96, 48.32, 43.22, 37.96, 32.93, 28.48, 24.77, 21.81, 19.44, 17.43, 15.58, 13.76, 11.9, 10.06, 8.31, 6.75, 5.42, 4.36, 3.54, 2.9, 2.4, 1.99, 1.62, 1.3, 1.01, 0.75, 0.54, 0.37, 0.24, 0.15, 0.09, 0.05, 0.03, 0.01, 0.01], "enes_poor": [301.06, 381.92, 465.54, 548.15, 628.14, 707.4, 791.8, 890.02, 1010.98, 1160.21, 1336.37, 1529.28, 1720.49, 1886.75, 2005.54, 2061.14, 2049.14, 1977.85, 1865.94, 1737.06, 1613.31, 1509.63, 1430.94, 1372.72, 1324.55, 1275.06, 1216.42, 1146.91, 1070.85, 996.25, 931.35, 881.39, 846.85, 823.62, 804.97, 784.25, 757.35, 724.04, 687.62, 653.34, 626.1, 608.44, 599.58, 595.72, 591.52, 582.06, 564.62, 539.47, 509.67, 479.71, 453.89, 434.79, 422.46, 414.68, 407.94, 398.84, 385.37, 367.5, 347.08, 326.98, 309.93, 297.52, 289.63, 284.6, 279.88, 273.04, 262.59, 248.45, 231.87, 214.89, 199.55, 187.2, 178.09, 171.43, 165.78, 159.63, 151.97, 142.56, 131.97, 121.26, 111.53, 103.57, 97.56, 93.11, 89.49, 85.87, 81.71, 76.85, 71.56, 66.36, 61.78, 58.18, 55.55, 53.61, 51.85, 49.77, 47.01, 43.5, 39.4, 35.06, 30.89], "esen_good": [127.1994, 164.4226, 204.1627, 244.0058, 281.3147, 313.6233, 339.0035, 356.3197, 365.3239, 366.5854, 361.2934, 350.9921, 337.3112, 321.7422, 305.4887, 289.3975, 273.9587, 259.3562, 245.5474, 232.3559, 219.5633, 206.99, 194.5498, 182.2705, 170.2764, 158.7407, 147.8267, 137.6404, 128.2103, 119.4984, 111.4327, 103.9449, 96.9963, 90.5848, 84.7338, 79.4702, 74.8023, 70.7018, 67.0966, 63.8742, 60.896, 58.0204, 55.1288, 52.1481, 49.0601, 45.8971, 42.7228, 39.6084, 36.6101, 33.7572, 31.0517, 28.4773, 26.0138, 23.6498, 21.391, 19.2613, 17.2964, 15.533, 13.9948, 12.6832, 11.5721, 10.6122, 9.7418, 8.9011, 8.0466, 7.1608, 6.2541, 5.3607, 4.5277, 3.8014, 3.2153, 2.7816, 2.4895, 2.3101, 2.2056, 2.1399, 2.0876, 2.039, 1.9991, 1.9829, 2.0071, 2.0824, 2.2067, 2.3634, 2.523, 2.6495, 2.7079, 2.6726, 2.533, 2.2962, 1.9852, 1.633, 1.2758, 0.9452, 0.6632, 0.4401, 0.2761, 0.1635, 0.0914, 0.0482, 0.0239], "esen_adeq": [15.7528, 21.5235, 28.3777, 36.1218, 44.4284, 52.8758, 61.0204, 68.4837, 75.0267, 80.5856, 85.2551, 89.2248, 92.6898, 95.7686, 98.4521, 100.6022, 101.9958, 102.4023, 101.6687, 99.7881, 96.9266, 93.4006, 89.6069, 85.9294, 82.6532, 79.9155, 77.7071, 75.9192, 74.4108, 73.067, 71.8267, 70.6747, 69.6086, 68.603, 67.5886, 66.4584, 65.0958, 63.4137, 61.3878, 59.0715, 56.5879, 54.1024, 51.7849, 49.7723, 48.1392, 46.8842, 45.9309, 45.1445, 44.3581, 43.4049, 42.1505, 40.5167, 38.4937, 36.1363, 33.5463, 30.8468, 28.1569, 25.5736, 23.1653, 20.9755, 19.0314, 17.3503, 15.9404, 14.7961, 13.8917, 13.1806, 12.604, 12.1051, 11.6445, 11.2063, 10.792, 10.4048, 10.0323, 9.6385, 9.1701, 8.5741, 7.8187, 6.908, 5.8833, 4.8125, 3.7716, 2.8277, 2.026, 1.3865, 0.9061, 0.5661, 0.3404, 0.2021, 0.1283, 0.1028, 0.1162, 0.1641, 0.2451, 0.357, 0.4936, 0.643, 0.7875, 0.9064, 0.98, 0.9954, 0.9498]};
+const CHARTS = [
+  ["c1",[{ys:D.engesl_74k,color:"#7986cb",lw:2,label:"en→es 74k"}]],
+  ["c2",[{ys:D.spaeng_74k,color:"#66bb6a",lw:2,label:"es→en 74k"}]],
+  ["c3",[{ys:D.enes_good,color:"#4fc3f7",lw:2,label:"Good (9,518)"},{ys:D.enes_adeq,color:"#ffb74d",lw:2,label:"Adequate (9,759)"},{ys:D.enes_poor,color:"#ef5350",lw:2,label:"Poor (6,219)"}]],
+  ["c4",[{ys:D.esen_good,color:"#4fc3f7",lw:2,label:"Good (934)"},{ys:D.esen_adeq,color:"#ffb74d",lw:2,label:"Adequate (404)"}]],
+];
+const xs=D.xs,xMax=10;
+function drawChart(id,series){
+  const canvas=document.getElementById(id),PR=window.devicePixelRatio||1;
+  const CW=canvas.parentElement.clientWidth-40,CH=280;
+  canvas.width=CW*PR;canvas.height=CH*PR;canvas.style.width=CW+"px";canvas.style.height=CH+"px";
+  const ctx=canvas.getContext("2d");ctx.scale(PR,PR);
+  const P={l:58,r:20,t:16,b:44},W=CW,H=CH;
+  let yMax=0;
+  for(const s of series)for(let i=0;i<xs.length;i++)if(xs[i]<=xMax&&s.ys[i]>yMax)yMax=s.ys[i];
+  yMax*=1.12;
+  const cx=x=>P.l+(x/xMax)*(W-P.l-P.r),cy=y=>P.t+(1-y/yMax)*(H-P.t-P.b);
+  ctx.fillStyle="#131520";ctx.fillRect(0,0,W,H);
+  ctx.strokeStyle="#1a1e2e";ctx.lineWidth=1;
+  for(let x=0;x<=xMax;x++){ctx.beginPath();ctx.moveTo(cx(x),P.t);ctx.lineTo(cx(x),H-P.b);ctx.stroke();}
+  for(let i=0;i<=4;i++){const y=yMax/4*i;ctx.beginPath();ctx.moveTo(P.l,cy(y));ctx.lineTo(W-P.r,cy(y));ctx.stroke();}
+  ctx.strokeStyle="#333";ctx.lineWidth=1.5;
+  ctx.beginPath();ctx.moveTo(P.l,P.t);ctx.lineTo(P.l,H-P.b);ctx.lineTo(W-P.r,H-P.b);ctx.stroke();
+  ctx.fillStyle="#666";ctx.font="11px system-ui";ctx.textAlign="center";
+  for(let x=0;x<=xMax;x+=2)ctx.fillText(x,cx(x),H-P.b+14);
+  ctx.fillStyle="#444";ctx.font="10px system-ui";ctx.fillText("MetricX score",W/2,H-P.b+28);
+  ctx.textAlign="right";ctx.fillStyle="#555";ctx.font="10px system-ui";
+  for(let i=0;i<=4;i++){const y=yMax/4*i;const l=y>=1000?(y/1000).toFixed(1).replace(".0","")+"k":Math.round(y).toString();ctx.fillText(l,P.l-6,cy(y)+3);}
+  const vi=xs.map((x,i)=>i).filter(i=>xs[i]<=xMax);
+  for(const s of series){
+    ctx.beginPath();let f=true;
+    for(const i of vi){const px=cx(xs[i]),py=cy(s.ys[i]);f?ctx.moveTo(px,py):ctx.lineTo(px,py);f=false;}
+    ctx.strokeStyle=s.color;ctx.lineWidth=s.lw;ctx.lineJoin="round";ctx.stroke();
+  }
+  if(series.length>1){
+    const lx=cx(5.2),ly=P.t+10;
+    ctx.fillStyle="#131520";ctx.fillRect(lx-6,ly-12,170,series.length*19+10);
+    ctx.strokeStyle="#1e2235";ctx.lineWidth=1;ctx.strokeRect(lx-6,ly-12,170,series.length*19+10);
+    series.forEach((s,i)=>{const y=ly+i*19;ctx.strokeStyle=s.color;ctx.lineWidth=s.lw;ctx.lineJoin="round";ctx.beginPath();ctx.moveTo(lx,y);ctx.lineTo(lx+22,y);ctx.stroke();ctx.fillStyle="#aaa";ctx.font="11px system-ui";ctx.textAlign="left";ctx.fillText(s.label,lx+28,y+4);});
+  }
+}
+window.addEventListener("load",()=>{for(const[id,s]of CHARTS)drawChart(id,s);});
+</script>
+</body>
+</html>
